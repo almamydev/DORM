@@ -7,7 +7,7 @@ name = "dorm"
 version = "0.1.0"
 description = "Django ORM playground — dev-only web UI for ORM queries"
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 requires-python = ">=3.10"
 authors = [
     { name = "almamydev", email = "almamydev10@gmail.com" },
@@ -22,7 +22,6 @@ classifiers = [
     "Framework :: Django :: 5.1",
     "Framework :: Django :: 5.2",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -41,6 +40,8 @@ dependencies = [
 dev = [
     "pytest",
     "pytest-django",
+    "build",
+    "twine",
 ]
 
 [project.urls]
