@@ -5,7 +5,7 @@ A Django ORM playground — a dev-only web UI to run ORM queries against your co
 ## Install
 
 ```bash
-pip install dorm
+pip install dorm-plg
 ```
 
 ## Setup
