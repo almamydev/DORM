@@ -19,16 +19,41 @@ MIDDLEWARE = [..., "django_htmx.middleware.HtmxMiddleware"]
 ```python
 # urls.py
 from django.urls import path, include
+from dorm import get_url_prefix
 
 urlpatterns = [
     ...
-    path("__dorm__/", include("dorm.urls", namespace="dorm")),
+    path(f"{get_url_prefix()}/", include("dorm.urls", namespace="dorm")),
 ]
 ```
 
 Open `/__dorm__/` in your browser and start writing ORM queries.
 
 > **Warning**: DORM executes arbitrary Python code in your Django process. It is gated behind `DEBUG=True` and must never be used in production.
+
+## Settings
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| `DORM_AUTH_ACCESS` | `bool` | `False` | When `True`, requires the user to be authenticated even in DEBUG mode |
+| `DORM_URL_NAME` | `str` | `"__dorm__"` | URL prefix where DORM is mounted (used by `get_url_prefix()`) |
+
+### Access rules
+
+| `DEBUG` | `DORM_AUTH_ACCESS` | Authenticated | Result |
+|---|---|---|---|
+| `False` | any | any | 404 |
+| `True` | `False` / unset | any | 200 |
+| `True` | `True` | yes | 200 |
+| `True` | `True` | no | 404 |
+
+Example with both settings:
+
+```python
+# settings.py
+DORM_AUTH_ACCESS = True   # require login
+DORM_URL_NAME = "dorm"    # mount at /dorm/
+```
 
 ## Usage
 
