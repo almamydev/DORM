@@ -1,0 +1,61 @@
+{% extends "dorm/base.html" %}
+
+{% block content %}
+<div class="dorm-root">
+
+    <header class="dorm-header">
+        <span class="dorm-logo">DORM</span>
+        <div class="dorm-layout-toggle">
+            <button class="dorm-layout-opt active" data-dir="row"
+                    onclick="dormSetLayout('row')" title="Side by side">
+                <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                    <rect x="0" y="0" width="7" height="14" rx="1.5" fill="currentColor"/>
+                    <rect x="11" y="0" width="7" height="14" rx="1.5" fill="currentColor"/>
+                </svg>
+            </button>
+            <button class="dorm-layout-opt" data-dir="col"
+                    onclick="dormSetLayout('col')" title="Stacked">
+                <svg width="14" height="18" viewBox="0 0 14 18" fill="none">
+                    <rect x="0" y="0" width="14" height="7" rx="1.5" fill="currentColor"/>
+                    <rect x="0" y="11" width="14" height="7" rx="1.5" fill="currentColor"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="dorm-layout" id="dorm-layout" data-dir="row">
+
+        <div class="dorm-pane" id="dorm-pane-a">
+            <div class="dorm-pane-bar">
+                <span class="dorm-pane-label">Query</span>
+                <button class="dorm-run-btn" type="submit" form="dorm-form">
+                    Run <kbd>Ctrl+Enter</kbd>
+                </button>
+            </div>
+            <form id="dorm-form"
+                  hx-post="{% url 'dorm:run' %}"
+                  hx-target="#dorm-result"
+                  hx-swap="innerHTML">
+                {% csrf_token %}
+                <textarea id="dorm-editor" name="code" class="dorm-editor"
+                          placeholder="# All models are auto-imported — no imports needed&#10;Author.objects.all()"
+                          spellcheck="false"
+                          autofocus></textarea>
+            </form>
+        </div>
+
+        <div class="dorm-divider" id="dorm-divider"></div>
+
+        <div class="dorm-pane" id="dorm-pane-b">
+            <div class="dorm-pane-bar">
+                <span class="dorm-pane-label">Result</span>
+                <label class="dorm-verbose-label">
+                    <input type="checkbox" id="dorm-verbose-cb" checked> Verbose names
+                </label>
+            </div>
+            <div id="dorm-result" class="dorm-result-body"></div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

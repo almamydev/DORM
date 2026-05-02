@@ -1,0 +1,31 @@
+{% if result_type == "table" %}
+<div class="dorm-result-bar">
+    <span class="dorm-result-meta">
+        {% if truncated %}Showing first {{ row_count }} rows (truncated)
+        {% else %}{{ row_count }} row{{ row_count|pluralize }}{% endif %}
+    </span>
+    <div class="dorm-export-btns">
+        <button class="dorm-export-btn" onclick="dormExport('csv')">↓ CSV</button>
+        <button class="dorm-export-btn" onclick="dormExport('json')">↓ JSON</button>
+    </div>
+</div>
+<div class="dorm-table-wrapper">
+    <table class="dorm-table" data-model="{{ model_name }}">
+        <thead>
+            <tr>{% for label, field in columns_meta %}<th data-verbose="{{ label }}" data-field="{{ field }}">{{ label }}</th>{% endfor %}</tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% elif result_type == "empty" %}
+<p class="dorm-result-meta">0 rows returned</p>
+
+{% elif result_type == "value" %}
+<pre class="dorm-value">{{ value }}</pre>
+
+{% endif %}

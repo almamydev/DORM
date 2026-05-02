@@ -1,0 +1,383 @@
+/* DORM — Django ORM Playground */
+
+:root {
+    --bg:              #e0e0e0;
+    --surface:         #ffffff;
+    --border:          #cccccc;
+    --header-bg:       #111111;
+    --header-text:     #ffffff;
+    --pane-bar-bg:     #f4f4f4;
+    --pane-bar-border: #e0e0e0;
+    --text:            #000000;
+    --text-muted:      #666666;
+    --divider:         #c0c0c0;
+    --divider-hover:   #555555;
+    --btn-bg:          #000000;
+    --btn-text:        #ffffff;
+    --btn-hover:       #333333;
+    --th-bg:           #1a1a1a;
+    --th-text:         #ffffff;
+    --td-border:       #eeeeee;
+    --row-hover:       #fafafa;
+    --value-bg:        #f8f8f8;
+    --error-bg:        #fff8f8;
+    --error-border:    #e0b0b0;
+    --error-text:      #cc0000;
+    --kbd-bg:          rgba(255,255,255,0.18);
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* ── Root shell ──────────────────────────────────────────── */
+
+.dorm-root {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+
+.dorm-header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    height: 44px;
+    background: var(--header-bg);
+    color: var(--header-text);
+}
+
+.dorm-logo {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--header-text);
+}
+
+/* ── Layout toggle buttons ───────────────────────────────── */
+
+.dorm-layout-toggle {
+    display: flex;
+    gap: 2px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 5px;
+    padding: 3px;
+}
+
+.dorm-layout-opt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 26px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    color: #888;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+}
+
+.dorm-layout-opt:hover {
+    color: #ccc;
+}
+
+.dorm-layout-opt.active {
+    background: #ffffff;
+    color: #000000;
+}
+
+/* ── Split layout container ──────────────────────────────── */
+
+.dorm-layout {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    gap: 0;
+}
+
+.dorm-layout[data-dir="row"]  { flex-direction: row; }
+.dorm-layout[data-dir="col"]  { flex-direction: column; }
+
+/* ── Panes ───────────────────────────────────────────────── */
+
+.dorm-pane {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
+    background: var(--surface);
+}
+
+#dorm-pane-a { flex: 0 0 50%; }
+#dorm-pane-b { flex: 1 1 0; }
+
+/* ── Pane top bar ────────────────────────────────────────── */
+
+.dorm-pane-bar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.875rem;
+    height: 36px;
+    background: var(--pane-bar-bg);
+    border-bottom: 1px solid var(--pane-bar-border);
+}
+
+.dorm-pane-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* ── Editor (input pane) ─────────────────────────────────── */
+
+#dorm-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.dorm-editor {
+    flex: 1;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: var(--surface);
+    color: var(--text);
+    font-family: "JetBrains Mono", "Fira Code", Consolas, "Courier New", monospace;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    border: none;
+    outline: none;
+    resize: none;
+}
+
+/* ── Verbose names checkbox ──────────────────────────────── */
+
+.dorm-verbose-label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+}
+
+.dorm-verbose-label input[type="checkbox"] {
+    accent-color: var(--btn-bg);
+    cursor: pointer;
+    width: 13px;
+    height: 13px;
+}
+
+/* ── Run button ──────────────────────────────────────────── */
+
+.dorm-run-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.3rem 0.9rem;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.dorm-run-btn:hover  { background: var(--btn-hover); }
+.dorm-run-btn:active { background: #555; }
+
+kbd {
+    font-size: 0.7rem;
+    padding: 0.1em 0.35em;
+    background: var(--kbd-bg);
+    border-radius: 3px;
+    font-family: inherit;
+}
+
+/* ── Divider ─────────────────────────────────────────────── */
+
+.dorm-divider {
+    flex: 0 0 5px;
+    background: var(--divider);
+    transition: background 0.12s;
+    position: relative;
+}
+
+.dorm-layout[data-dir="row"] .dorm-divider  { cursor: col-resize; }
+.dorm-layout[data-dir="col"] .dorm-divider  { cursor: row-resize; }
+
+.dorm-divider:hover { background: var(--divider-hover); }
+
+/* Expand hit area by 4px on each side */
+.dorm-layout[data-dir="row"] .dorm-divider::after {
+    content: "";
+    position: absolute;
+    inset: 0 -4px;
+}
+.dorm-layout[data-dir="col"] .dorm-divider::after {
+    content: "";
+    position: absolute;
+    inset: -4px 0;
+}
+
+/* ── Result body ─────────────────────────────────────────── */
+
+.dorm-result-body {
+    flex: 1;
+    overflow: auto;
+    padding: 0.875rem 1rem;
+}
+
+/* ── Result bar (meta + export buttons) ─────────────────── */
+
+.dorm-result-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.dorm-result-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.dorm-export-btns {
+    display: flex;
+    gap: 4px;
+}
+
+.dorm-export-btn {
+    padding: 0.2rem 0.6rem;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.dorm-export-btn:hover {
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    border-color: var(--btn-bg);
+}
+
+.dorm-table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.dorm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.dorm-table th {
+    padding: 0.5rem 0.875rem;
+    background: var(--th-bg);
+    color: var(--th-text);
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+    border-bottom: none;
+}
+
+.dorm-table td {
+    padding: 0.4rem 0.875rem;
+    border-bottom: 1px solid var(--td-border);
+    color: var(--text);
+    font-family: "JetBrains Mono", Consolas, monospace;
+    white-space: nowrap;
+}
+
+.dorm-table tr:last-child td { border-bottom: none; }
+.dorm-table tr:hover td      { background: var(--row-hover); }
+
+/* ── Value output ────────────────────────────────────────── */
+
+.dorm-value {
+    padding: 0.875rem 1rem;
+    background: var(--value-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: "JetBrains Mono", Consolas, monospace;
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* ── Error output ────────────────────────────────────────── */
+
+.dorm-error {
+    padding: 0.875rem 1rem;
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    border-radius: 4px;
+}
+
+.dorm-error-title {
+    font-family: "JetBrains Mono", Consolas, monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--error-text);
+    margin-bottom: 0.5rem;
+}
+
+.dorm-error-traceback {
+    font-family: "JetBrains Mono", Consolas, monospace;
+    font-size: 0.75rem;
+    color: var(--error-text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    opacity: 0.75;
+}
+
+/* ── Drag state ──────────────────────────────────────────── */
+
+body.is-resizing-row {
+    cursor: col-resize !important;
+    user-select: none;
+}
+body.is-resizing-col {
+    cursor: row-resize !important;
+    user-select: none;
+}
+
+/* Prevent pane content from stealing the cursor during drag */
+body.is-resizing-row .dorm-pane,
+body.is-resizing-col .dorm-pane {
+    pointer-events: none;
+}

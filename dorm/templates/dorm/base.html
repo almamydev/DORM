@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DORM — Django ORM Playground</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'dorm/css/dorm.css' %}">
+    <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+    <script src="{% static 'dorm/js/dorm.js' %}" defer></script>
+</head>
+<body>
+    {% block content %}{% endblock %}
+</body>
+</html>

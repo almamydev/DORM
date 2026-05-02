@@ -1,0 +1,4 @@
+recursive-include dorm/templates *.html
+recursive-include dorm/static *.css *.js
+include README.md
+include LICENSE

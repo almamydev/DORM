@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dorm"
+version = "0.1.0"
+description = "Django ORM playground — dev-only web UI for ORM queries"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [
+    { name = "almamydev", email = "almamydev10@gmail.com" },
+]
+keywords = ["django", "orm", "playground", "developer-tools", "debugging"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Debuggers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "Django>=4.2",
+    "django-htmx>=1.17",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-django",
+]
+
+[project.urls]
+Homepage = "https://github.com/almamydev/dorm"
+Repository = "https://github.com/almamydev/dorm"
+"Bug Tracker" = "https://github.com/almamydev/dorm/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["dorm*"]
+
+[tool.setuptools.package-data]
+"dorm" = [
+    "templates/dorm/**/*.html",
+    "static/dorm/css/*.css",
+    "static/dorm/js/*.js",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "sandbox.settings"
+pythonpath = ["sandbox"]
