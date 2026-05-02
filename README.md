@@ -76,8 +76,8 @@ Press **Ctrl+Enter** or click **Run** to execute. Results are rendered as a tabl
 ## Development
 
 ```bash
-git clone https://github.com/yourname/dorm
-cd dorm
+git clone https://github.com/almamydev/DORM
+cd DORM
 python3.10 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
