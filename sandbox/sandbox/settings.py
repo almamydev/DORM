@@ -58,6 +58,11 @@ DATABASES = {
     }
 }
 
+DORM_STORAGE = {
+    "BACKEND": "json",
+    "OPTIONS": {"path": BASE_DIR / "dorm_db.json"},
+}
+
 STATIC_URL = "/static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

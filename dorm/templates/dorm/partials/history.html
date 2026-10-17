@@ -1,0 +1,29 @@
+{% if error %}<p class="dorm-modal-error">{{ error }}</p>{% endif %}
+
+<div class="dorm-tab-panel" data-tab="recents" role="tabpanel">
+    {% for item in recents %}
+    <div class="dorm-hist-item">
+        <div class="dorm-hist-head">
+            {% if item.ts %}<time class="dorm-hist-meta" datetime="{{ item.ts|date:'c' }}">{{ item.ts|date:"M j, H:i:s" }}</time>{% else %}<span></span>{% endif %}
+            {% include "dorm/partials/history_actions.html" %}
+        </div>
+        <pre class="dorm-hist-code">{{ item.code }}</pre>
+    </div>
+    {% empty %}
+    <p class="dorm-hist-empty">No queries run yet.</p>
+    {% endfor %}
+</div>
+
+<div class="dorm-tab-panel" data-tab="saved" role="tabpanel">
+    {% for item in saved %}
+    <div class="dorm-hist-item">
+        <div class="dorm-hist-head">
+            <span class="dorm-hist-name">{{ item.name }}</span>
+            {% include "dorm/partials/history_actions.html" %}
+        </div>
+        <pre class="dorm-hist-code">{{ item.code }}</pre>
+    </div>
+    {% empty %}
+    <p class="dorm-hist-empty">No saved commands. Use the bookmark icon on a cell to save one.</p>
+    {% endfor %}
+</div>

@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dorm-plg"
-version = "0.1.1.1"
-description = "Django ORM playground — dev-only web UI for ORM queries"
+version = "0.2.0"
+description = "Django ORM playground — notebook-style web UI for running ORM queries"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
@@ -37,8 +37,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+redis = [
+    "redis>=5",
+]
 dev = [
     "pytest",
+    "fakeredis",
     "pytest-django",
     "build",
     "twine",

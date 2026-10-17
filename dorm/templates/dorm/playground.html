@@ -5,21 +5,27 @@
 
     <header class="dorm-header">
         <span class="dorm-logo">DORM</span>
-        <div class="dorm-layout-toggle">
-            <button class="dorm-layout-opt active" data-dir="row"
-                    onclick="dormSetLayout('row')" title="Side by side">
-                <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
-                    <rect x="0" y="0" width="7" height="14" rx="1.5" fill="currentColor"/>
-                    <rect x="11" y="0" width="7" height="14" rx="1.5" fill="currentColor"/>
-                </svg>
+        <div class="dorm-header-actions">
+            <button type="button" class="dorm-header-btn" onclick="dormOpenHistory()">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9M2.5 2.5v2.5H5"/><path d="M8 5v3l2 1.5"/></svg>
+                History
             </button>
-            <button class="dorm-layout-opt" data-dir="col"
-                    onclick="dormSetLayout('col')" title="Stacked">
-                <svg width="14" height="18" viewBox="0 0 14 18" fill="none">
-                    <rect x="0" y="0" width="14" height="7" rx="1.5" fill="currentColor"/>
-                    <rect x="0" y="11" width="14" height="7" rx="1.5" fill="currentColor"/>
-                </svg>
-            </button>
+            <div class="dorm-layout-toggle">
+                <button class="dorm-layout-opt active" data-dir="row"
+                        onclick="dormSetLayout('row')" title="Side by side">
+                    <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                        <rect x="0" y="0" width="7" height="14" rx="1.5" fill="currentColor"/>
+                        <rect x="11" y="0" width="7" height="14" rx="1.5" fill="currentColor"/>
+                    </svg>
+                </button>
+                <button class="dorm-layout-opt" data-dir="col"
+                        onclick="dormSetLayout('col')" title="Stacked">
+                    <svg width="14" height="18" viewBox="0 0 14 18" fill="none">
+                        <rect x="0" y="0" width="14" height="7" rx="1.5" fill="currentColor"/>
+                        <rect x="0" y="11" width="14" height="7" rx="1.5" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -28,20 +34,17 @@
         <div class="dorm-pane" id="dorm-pane-a">
             <div class="dorm-pane-bar">
                 <span class="dorm-pane-label">Query</span>
-                <button class="dorm-run-btn" type="submit" form="dorm-form">
+                <button class="dorm-run-btn" type="button" onclick="dormRunActive()">
                     Run <kbd>Ctrl+Enter</kbd>
                 </button>
             </div>
-            <form id="dorm-form"
-                  hx-post="{% url 'dorm:run' %}"
-                  hx-target="#dorm-result"
-                  hx-swap="innerHTML">
+            <div id="dorm-cells" class="dorm-cells"
+                 data-run-url="{% url 'dorm:run' %}"
+                 data-export-url="{% url 'dorm:export' %}"
+                 data-history-url="{% url 'dorm:history' %}"
+                 data-save-url="{% url 'dorm:save' %}">
                 {% csrf_token %}
-                <textarea id="dorm-editor" name="code" class="dorm-editor"
-                          placeholder="# All models are auto-imported — no imports needed&#10;Author.objects.all()"
-                          spellcheck="false"
-                          autofocus></textarea>
-            </form>
+            </div>
         </div>
 
         <div class="dorm-divider" id="dorm-divider"></div>
@@ -58,4 +61,63 @@
 
     </div>
 </div>
+
+<div id="dorm-modal" class="dorm-modal" hidden>
+    <div class="dorm-modal-backdrop" data-close></div>
+    <div class="dorm-modal-dialog" role="dialog" aria-modal="true" aria-label="History">
+        <div class="dorm-modal-head">
+            <div class="dorm-tabs" role="tablist">
+                <button type="button" class="dorm-tab" role="tab" data-tab="recents">Recents</button>
+                <button type="button" class="dorm-tab" role="tab" data-tab="saved">Saved</button>
+            </div>
+            <button type="button" class="dorm-modal-close" data-close aria-label="Close">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>
+            </button>
+        </div>
+        <div id="dorm-modal-body" class="dorm-modal-body" data-url="{% url 'dorm:history' %}"></div>
+    </div>
+</div>
+
+<div id="dorm-export-modal" class="dorm-modal" hidden>
+    <div class="dorm-modal-backdrop" data-close></div>
+    <div class="dorm-modal-dialog dorm-modal-dialog--sm" role="dialog" aria-modal="true" aria-label="Export">
+        <div class="dorm-modal-head">
+            <span class="dorm-pane-label">Export <span data-export-format></span></span>
+            <button type="button" class="dorm-modal-close" data-close aria-label="Close">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>
+            </button>
+        </div>
+        <div class="dorm-export-body">
+            <p class="dorm-export-intro">This result is truncated. Which rows do you want to export?</p>
+            <button type="button" class="dorm-export-choice" data-choice="visible">
+                <span class="dorm-export-choice-title">Loaded rows</span>
+                <span class="dorm-export-choice-desc" data-export-visible></span>
+            </button>
+            <button type="button" class="dorm-export-choice" data-choice="full">
+                <span class="dorm-export-choice-title">Full result</span>
+                <span class="dorm-export-choice-desc" data-export-full></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="dorm-toast" class="dorm-toast" role="status" aria-live="polite"></div>
+
+<template id="dorm-cell-tpl">
+    <div class="dorm-cell" data-state="draft">
+        <div class="dorm-cell-prompt">[ ]</div>
+        <div class="dorm-cell-editor"></div>
+        <div class="dorm-cell-actions">
+            <button type="button" class="dorm-cell-btn" data-action="run" title="Run (Ctrl+Enter)" aria-label="Run">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5z"/></svg>
+            </button>
+            <button type="button" class="dorm-cell-btn" data-action="save" title="Save command" aria-label="Save">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M4 2h8v12l-4-3-4 3z"/></svg>
+            </button>
+            <button type="button" class="dorm-cell-btn" data-action="remove" title="Remove from flow" aria-label="Remove">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4M6.8 6.5v4.5M9.2 6.5v4.5"/></svg>
+            </button>
+        </div>
+    </div>
+</template>
 {% endblock %}

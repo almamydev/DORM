@@ -1,7 +1,7 @@
 {% if result_type == "table" %}
 <div class="dorm-result-bar">
     <span class="dorm-result-meta">
-        {% if truncated %}Showing first {{ row_count }} rows (truncated)
+        {% if truncated %}Showing first {{ row_count }}{% if total %} of {{ total }}{% endif %} rows (truncated)
         {% else %}{{ row_count }} row{{ row_count|pluralize }}{% endif %}
     </span>
     <div class="dorm-export-btns">
@@ -10,7 +10,8 @@
     </div>
 </div>
 <div class="dorm-table-wrapper">
-    <table class="dorm-table" data-model="{{ model_name }}">
+    <table class="dorm-table" data-model="{{ model_name }}"
+           data-truncated="{{ truncated|yesno:'true,false' }}" data-total="{{ total|default_if_none:'' }}">
         <thead>
             <tr>{% for label, field in columns_meta %}<th data-verbose="{{ label }}" data-field="{{ field }}">{{ label }}</th>{% endfor %}</tr>
         </thead>

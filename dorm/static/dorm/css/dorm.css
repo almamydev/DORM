@@ -24,6 +24,18 @@
     --error-border:    #e0b0b0;
     --error-text:      #cc0000;
     --kbd-bg:          rgba(255,255,255,0.18);
+    --cell-sep:        #c8c8c8;
+    --cell-active:     #000000;
+    --cm-keyword:      #7a2e8e;
+    --cm-builtin:      #1b5fa8;
+    --cm-def:          #1b5fa8;
+    --cm-string:       #2b7a39;
+    --cm-number:       #b35900;
+    --cm-comment:      #8a8a8a;
+    --cm-property:     #3a3a3a;
+    --cm-selection:    #dcdcdc;
+    --cm-match:        #e4e4e4;
+    --modal-backdrop:  rgba(0,0,0,0.28);
 }
 
 *, *::before, *::after {
@@ -68,6 +80,30 @@ html, body {
     letter-spacing: 0.18em;
     color: var(--header-text);
 }
+
+.dorm-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.dorm-header-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 32px;
+    padding: 0 0.75rem;
+    background: rgba(255,255,255,0.08);
+    color: #cccccc;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+}
+
+.dorm-header-btn:hover { background: #ffffff; color: #000000; }
 
 /* ── Layout toggle buttons ───────────────────────────────── */
 
@@ -149,28 +185,335 @@ html, body {
     color: var(--text-muted);
 }
 
-/* ── Editor (input pane) ─────────────────────────────────── */
+/* ── Notebook cells (input pane) ─────────────────────────── */
 
-#dorm-form {
+.dorm-cells {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
+    overflow-y: auto;
+    padding: 0.25rem 0 3rem;
 }
 
-.dorm-editor {
-    flex: 1;
-    width: 100%;
-    padding: 0.875rem 1rem;
+.dorm-cell {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    padding: 0.5rem 0.75rem 0.5rem 0;
+    border-left: 2px solid transparent;
+}
+
+/* Cells are separated by a dashed rule, not boxed */
+.dorm-cell + .dorm-cell {
+    border-top: 1px dashed var(--cell-sep);
+}
+
+.dorm-cell.is-active             { border-left-color: var(--cell-active); }
+.dorm-cell[data-state="error"]   { border-left-color: var(--error-text); }
+
+.dorm-cell-prompt {
+    padding-top: 0.15rem;
+    padding-right: 0.5rem;
+    text-align: right;
+    font-family: "JetBrains Mono", Consolas, monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    user-select: none;
+    white-space: pre;
+}
+
+.dorm-cell[data-state="running"] .dorm-cell-prompt { color: var(--text); }
+.dorm-cell[data-state="error"]   .dorm-cell-prompt { color: var(--error-text); }
+
+.dorm-cell-editor { min-width: 0; }
+
+/* Icon actions, revealed on hover */
+.dorm-cell-actions {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.5rem;
+    display: flex;
+    gap: 2px;
+    padding: 2px;
     background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s;
+    z-index: 5;
+}
+
+.dorm-cell:hover .dorm-cell-actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.dorm-cell-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 22px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+}
+
+.dorm-cell-btn:hover                       { background: var(--btn-bg); color: var(--btn-text); }
+.dorm-cell-btn[data-action="remove"]:hover { background: var(--error-text); }
+
+/* ── CodeMirror inside cells ─────────────────────────────── */
+
+.dorm-cell .CodeMirror {
+    height: auto;
+    background: transparent;
     color: var(--text);
     font-family: "JetBrains Mono", "Fira Code", Consolas, "Courier New", monospace;
     font-size: 0.875rem;
     line-height: 1.65;
-    border: none;
-    outline: none;
-    resize: none;
 }
+
+.dorm-cell .CodeMirror-lines        { padding: 0; }
+.dorm-cell .CodeMirror pre.CodeMirror-line,
+.dorm-cell .CodeMirror pre.CodeMirror-line-like { padding: 0; }
+.dorm-cell .CodeMirror-cursor       { border-left-color: var(--text); }
+.dorm-cell .CodeMirror-selected     { background: var(--cm-selection); }
+.dorm-cell .CodeMirror-focused .CodeMirror-selected { background: var(--cm-selection); }
+.dorm-cell .CodeMirror-placeholder  { color: #aaaaaa; }
+
+.cm-s-default .cm-keyword   { color: var(--cm-keyword); font-weight: 600; }
+.cm-s-default .cm-builtin   { color: var(--cm-builtin); }
+.cm-s-default .cm-def       { color: var(--cm-def); }
+.cm-s-default .cm-string    { color: var(--cm-string); }
+.cm-s-default .cm-number    { color: var(--cm-number); }
+.cm-s-default .cm-comment   { color: var(--cm-comment); font-style: italic; }
+.cm-s-default .cm-operator  { color: var(--text-muted); }
+.cm-s-default .cm-variable  { color: var(--text); }
+.cm-s-default .cm-variable-2,
+.cm-s-default .cm-property  { color: var(--cm-property); }
+.cm-s-default .cm-meta      { color: var(--cm-keyword); }
+
+.dorm-cell .CodeMirror-matchingbracket    { color: var(--text) !important; background: var(--cm-match); }
+.dorm-cell .CodeMirror-nonmatchingbracket { color: var(--error-text) !important; }
+
+/* ── History modal ───────────────────────────────────────── */
+
+.dorm-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.dorm-modal[hidden],
+.dorm-tab-panel[hidden] { display: none; }
+
+.dorm-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--modal-backdrop);
+}
+
+.dorm-modal-dialog {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: min(680px, 100%);
+    max-height: min(70vh, 640px);
+    background: var(--surface);
+    border-radius: 6px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    overflow: hidden;
+}
+
+.dorm-modal-head {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.5rem 0 0.875rem;
+    height: 42px;
+    background: var(--pane-bar-bg);
+    border-bottom: 1px solid var(--pane-bar-border);
+}
+
+.dorm-tabs {
+    display: flex;
+    align-self: stretch;
+    gap: 1rem;
+}
+
+.dorm-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0 0.1rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.dorm-tab:hover     { color: var(--text); }
+.dorm-tab.is-active { color: var(--text); border-bottom-color: var(--text); }
+
+.dorm-modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.dorm-modal-close:hover { background: var(--btn-bg); color: var(--btn-text); }
+
+.dorm-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 120px;
+}
+
+.dorm-modal-error {
+    margin: 0.875rem;
+    font-size: 0.8rem;
+    color: var(--error-text);
+}
+
+.dorm-hist-item {
+    padding: 0.6rem 0.875rem;
+}
+
+.dorm-hist-item + .dorm-hist-item {
+    border-top: 1px dashed var(--cell-sep);
+}
+
+.dorm-hist-item:hover { background: var(--row-hover); }
+
+.dorm-hist-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 24px;
+    margin-bottom: 0.25rem;
+}
+
+.dorm-hist-meta {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.dorm-hist-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.dorm-hist-actions {
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.12s;
+}
+
+.dorm-hist-item:hover .dorm-hist-actions { opacity: 1; }
+
+.dorm-hist-code {
+    font-family: "JetBrains Mono", Consolas, monospace;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 9.5em;
+    overflow: hidden;
+}
+
+.dorm-hist-empty {
+    padding: 2rem 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* ── Export choice modal ─────────────────────────────────── */
+
+.dorm-modal-dialog--sm { width: min(440px, 100%); }
+
+.dorm-export-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.875rem;
+}
+
+.dorm-export-intro {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.dorm-export-choice {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.65rem 0.8rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    text-align: left;
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.1s, background 0.1s;
+}
+
+.dorm-export-choice:hover,
+.dorm-export-choice:focus-visible {
+    border-color: var(--text);
+    background: var(--row-hover);
+    outline: none;
+}
+
+.dorm-export-choice-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.dorm-export-choice-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+}
+
+/* ── Toast ───────────────────────────────────────────────── */
+
+.dorm-toast {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    padding: 0.5rem 0.9rem;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity 0.15s, transform 0.15s;
+    z-index: 50;
+}
+
+.dorm-toast.is-visible { opacity: 1; transform: none; }
+.dorm-toast.is-error   { background: var(--error-text); }
 
 /* ── Verbose names checkbox ──────────────────────────────── */
 
@@ -346,6 +689,15 @@ kbd {
     background: var(--error-bg);
     border: 1px solid var(--error-border);
     border-radius: 4px;
+}
+
+.dorm-error-cell {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--error-text);
+    margin-bottom: 0.35rem;
 }
 
 .dorm-error-title {

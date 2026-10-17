@@ -10,3 +10,4 @@ sandbox/db.sqlite3
 *.sqlite3
 .env
 .pytest_cache/
+sandbox/dorm_db.json
