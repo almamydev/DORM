@@ -11,3 +11,6 @@ sandbox/db.sqlite3
 .env
 .pytest_cache/
 sandbox/dorm_db.json
+docs/demo/raw/
+docs/demo/demo.sqlite3
+docs/demo/demo_dorm.json

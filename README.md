@@ -2,6 +2,10 @@
 
 A browser playground for the Django ORM: run Python/ORM code against your database in notebook-style cells and see results as a table.
 
+![DORM demo](https://raw.githubusercontent.com/almamydev/DORM/main/docs/demo.gif)
+
+<sub>[Watch in full quality (MP4)](https://raw.githubusercontent.com/almamydev/DORM/main/docs/demo.mp4)</sub>
+
 > DORM executes arbitrary Python in your Django process. Read [Access](#access) before enabling it anywhere but your laptop.
 
 ## Install
